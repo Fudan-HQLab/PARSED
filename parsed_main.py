@@ -288,7 +288,10 @@ def micGen(name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reve
         mask_fini = (mask_ref > lo_thresholdP).astype('uint8')
         mask_fini = cv2.dilate(mask_fini , npcircle( global_TrackParticleSize_actual ) , iterations = 1)
 
-        im2, contours, hierarchy = cv2.findContours(mask_fini, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  
+        #im2, contours, hierarchy = cv2.findContours(mask_fini, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  
+        # cv2 not return image now
+        im2 = mask_fini.copy()
+        contours, hierarchy = cv2.findContours(im2, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  
         im3 = np.zeros_like(im2)
         # maximum_size
         thresArea = 225
@@ -427,8 +430,8 @@ def track_part(pred_test, downMap, mediumName, \
     SkipPickNum = 0
 
 
-    with open('./%s/%s_%s.star' %(output_PATH , nameC[:-4] , job_suffix), 'w') as coorF:
-        coorFa = open('./%s/%s_%s_param.star' %(output_PATH , nameC[:-4] , job_suffix), 'w')
+    with open('/%s/%s_%s.star' %(output_PATH , nameC[:-4] , job_suffix), 'w') as coorF:
+        coorFa = open('/%s/%s_%s_param.star' %(output_PATH , nameC[:-4] , job_suffix), 'w')
         coorTrack = coorTrackPY.copy()#[['x','y']]
         # STAR HEADING
         coorF.write( header )
@@ -629,12 +632,12 @@ def void_picking(optionsk,argsk):
     print('Coordinates extraction finished\t\t%8d TotalPickNum found' %TotalPickNum)
     
     # record picking parameters info
-    with open('./%s/%s_columns.star' %(output_PATH , job_suffix), 'w') as coorFb:
+    with open('/%s/%s_columns.star' %(output_PATH , job_suffix), 'w') as coorFb:
         for item in list(['x' 'y' 'mass' 'size' 'ecc' 'signal' 'raw_mass' 'ep']+['prob' + 'mask']):#list(coorTrackPY.columns.values):
             coorFb.write('%s\t' %item)
             
     # record checkpoint time
-    with h5py.File('./%s/%s_%s.h5' %(output_PATH , 'timeseries' , job_suffix), 'w') as h5t:
+    with h5py.File('/%s/%s_%s.h5' %(output_PATH , 'timeseries' , job_suffix), 'w') as h5t:
         h5t['begin'] = np.asarray(timeseries_begin)
         h5t['end1'] = np.asarray(timeseries_end1)
         h5t['end2'] = np.asarray(timeseries_end2)
@@ -739,10 +742,10 @@ if __name__ == '__main__':
             # limit tf memory usage
             import tensorflow as tf
             os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-            config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
+            config = tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=False)
             #config.gpu_options.allow_growth = True
             config.gpu_options.per_process_gpu_memory_fraction = 0.15
-            session = tf.Session(config=config)
+            session = tf.compat.v1.Session(config=config)
 
             from keras.utils import Sequence
             
