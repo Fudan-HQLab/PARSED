@@ -4,6 +4,7 @@ import glob
 import time
 import multiprocessing
 from optparse import OptionParser, SUPPRESS_HELP
+from argparse import ArgumentParser
 
 # Loading third party packages
 import numpy as np
@@ -12,7 +13,7 @@ import numpy as np
 def recordingSize(orig_ny, orig_nx , inner_ny ,inner_nx , name , mname ):
     # Recording originSize and downscaleSize
     with h5py.File( mname , 'w') as h5F:
-        dset = h5F.create_dataset('meta' , (4,) , dtype = np.float ,compression = 'gzip')
+        dset = h5F.create_dataset('meta' , (4,) , dtype = np.float32 ,compression = 'gzip')
         dset[:] = np.asarray([ orig_ny, orig_nx , inner_ny ,inner_nx ])
     return 0
 
@@ -20,11 +21,11 @@ def recordingMaskSize(orig_ny, orig_nx , inner_ny ,inner_nx , name , mname , pro
     # Recording originSize and downscaleSize
     with h5py.File( mname , 'w') as h5F:
         #print(mname)
-        dset = h5F.create_dataset('meta' , (4,) , dtype = np.float ,compression = 'gzip')
+        dset = h5F.create_dataset('meta' , (4,) , dtype = np.float32 ,compression = 'gzip')
         dset[:] = np.asarray([ orig_ny, orig_nx , inner_ny ,inner_nx ])
-        dset2 = h5F.create_dataset('promap' , promap.shape , dtype = np.float ,compression = 'gzip')
+        dset2 = h5F.create_dataset('promap' , promap.shape , dtype = np.float32 ,compression = 'gzip')
         dset2[:]= promap
-        dset3 = h5F.create_dataset('maskmap' , maskmap.shape , dtype = np.int ,compression = 'gzip')
+        dset3 = h5F.create_dataset('maskmap' , maskmap.shape , dtype = np.int32 ,compression = 'gzip')
         dset3[:]= maskmap        
     return 0
 
@@ -84,8 +85,8 @@ def k2means(inputSerial, k = 2, iters = 3):
     for i in range(k):
         sites[i] = inputSerial[np.random.randint(lenSer)]
     iterss = 0
-    sites_new = np.zeros_like(sites,dtype=np.float)
-    sites_new_count = np.zeros_like(sites,dtype=np.float)
+    sites_new = np.zeros_like(sites,dtype=np.float32)
+    sites_new_count = np.zeros_like(sites,dtype=np.float32)
     while iterss < iters:
         iterss += 1
         for i in range(lenSer):
@@ -187,7 +188,6 @@ def adpmass(inMap, inSize=9 , binSize=30 , conv = 5 , thres = 5 ):
 def micGen(name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reverseI = True , highPass = 500 , hard = True , lowerBound = 0 , upperBound = 3, DEBUG=False, global_TrackParticleSize_actual = 9, hard_dust_removal=True , cuttingedge_lowD=0 , cuttingedge_highD=-1 , cscale = 4):
     #Input Map
     inputMap = np.zeros( (inputSize , inputSize , 1) , dtype = np.float32)
-
     with mrcfile.open(name , 'r' , permissive=True) as mrc:
         origMap  = np.float32(mrc.data)
         origMapNC= mic_preprocess.nmlizeC(iput = origMap , cscale = 4)
@@ -371,16 +371,16 @@ def track_part(pred_test, downMap, mediumName, \
     # append segmap
 
     with h5py.File( mediumName , 'a') as h5F:
-        dset = h5F.create_dataset('fcn' , (fcn_mapSize,fcn_mapSize , numClass) , dtype = np.float ,compression = 'gzip')
+        dset = h5F.create_dataset('fcn' , (fcn_mapSize,fcn_mapSize , numClass) , dtype = np.float32 ,compression = 'gzip')
         dset[:] = pred_test[0,:].reshape(fcn_mapSize,fcn_mapSize , numClass)
 
     # load origal size
     with h5py.File( mediumName , 'r') as h5F:
         orig_ny , orig_nx , ds_ny ,ds_nx = h5F['meta'][:]
-        tp_map = h5F['fcn'][:np.int(ds_ny) , :np.int(ds_nx) , numClass - 1][:]
+        tp_map = h5F['fcn'][:np.int32(ds_ny) , :np.int32(ds_nx) , numClass - 1][:]
         scale_ny = orig_ny / ds_ny; scale_nx = orig_nx / ds_nx
 
-    tpy, tpx = np.asarray([ds_ny ,ds_nx]).astype(np.int)
+    tpy, tpx = np.asarray([ds_ny ,ds_nx]).astype(np.int32)
 
 
     if hard_dust_removal:
@@ -443,8 +443,8 @@ def track_part(pred_test, downMap, mediumName, \
             if (getattr(coor,'prob') < thresProb):
                 SkipPickNum += 1
                 continue
-            coorF.write( '\n' + str( np.floor(coor_x).astype(np.int) ).rjust( 6 ) + '.000000' + str( np.floor(coor_y).astype(np.int) ).rjust( 6 ) + '.000000 ' )
-            coorFa.write( '\n' + str( np.floor(coor_x).astype(np.int) ).rjust( 6 ) + '.000000' + str( np.floor(coor_y).astype(np.int) ).rjust( 6 ) + '.000000 ' )
+            coorF.write( '\n' + str( np.floor(coor_x).astype(np.int32) ).rjust( 6 ) + '.000000' + str( np.floor(coor_y).astype(np.int32) ).rjust( 6 ) + '.000000 ' )
+            coorFa.write( '\n' + str( np.floor(coor_x).astype(np.int32) ).rjust( 6 ) + '.000000' + str( np.floor(coor_y).astype(np.int32) ).rjust( 6 ) + '.000000 ' )
             for item in list(coorTrackPY.columns.values):
                 coorFa.write('%5.6f ' %getattr(coor, item))
         coorFa.close()
@@ -458,7 +458,7 @@ def track_part(pred_test, downMap, mediumName, \
     return tTotalPickNum
 
 
-def void_picking(optionsk,argsk):
+def void_picking(optionsk):
    
     model_adopt = optionsk.model
     job_suffix = optionsk.job_suffix
@@ -483,7 +483,7 @@ def void_picking(optionsk,argsk):
 
     cuttingedge_low   =  optionsk.edge_cut
     cuttingedge_high  =  optionsk.img_size - cuttingedge_low
-    cuttingedge_lowD  =  np.ceil(cuttingedge_low / (optionsk.img_size / fcn_mapSize )).astype(np.int)
+    cuttingedge_lowD  =  np.ceil(cuttingedge_low / (optionsk.img_size / fcn_mapSize )).astype(np.int32)
     cuttingedge_highD =  fcn_mapSize - cuttingedge_lowD
 
     thresProb = optionsk.prob_thres
@@ -670,47 +670,48 @@ if __name__ == '__main__':
     global_timer = True
     global_lo_thresmin = 0.10
     
-    parser = OptionParser(usage , version='PARSED 0.0.1')
-    
+    #parser = OptionParser(usage , version='PARSED 0.0.1')
+    parser = ArgumentParser(progName, usage, epilog='PARSED 0.0.1') 
+
     #Job Parameters
-    parser.add_option("--model", metavar='./pre_train_model.h5', default='./pre_train_model.h5', type='string', help = "file name of used model (default pre_train_model.h5)")
-    parser.add_option("--data_path", metavar='PATH_OF_MICROGRAPHS', default=None, type='string', help= "path for target micrograph sets")
-    parser.add_option("--output_path", metavar="PATH_OUTPUT", default=None, type='string', help="path for output location")
-    parser.add_option("--file_pattern", metavar="stack_*_00??.mrc", default = None, type='string', help = "regular expression for matching micrograph files")
-    parser.add_option("--job_suffix", metavar='demo0', default='demo0', type='string', help = "output coordinates files suffix (default demo0)")
-    parser.add_option("--angpixel", metavar=1.0, default=None, type=np.float, help = "micrograph sample-rate (default 1.0 A/pixel)")
-    parser.add_option("--img_size", metavar=4096, default=None, type=np.int, help = "long edge size of micrograph files (default 4096)")
-    parser.add_option("--edge_cut", metavar=0, default=0, type=np.int, help = "edge crop size for micrograph files (default 0)")
+    parser.add_argument("--model", metavar='./pre_train_model.h5', default='./pre_train_model.h5', type=str, help = "file name of used model (default pre_train_model.h5)")
+    parser.add_argument("--data_path", metavar='PATH_OF_MICROGRAPHS', default=None, type=str, help= "path for target micrograph sets")
+    parser.add_argument("--output_path", metavar="PATH_OUTPUT", default=None, type=str, help="path for output location")
+    parser.add_argument("--file_pattern", metavar="stack_*_00??.mrc", default = None, type=str, help = "regular expression for matching micrograph files")
+    parser.add_argument("--job_suffix", metavar='demo0', default='demo0', type=str, help = "output coordinates files suffix (default demo0)")
+    parser.add_argument("--angpixel", metavar=1.0, default=None, type=np.float32, help = "micrograph sample-rate (default 1.0 A/pixel)")
+    parser.add_argument("--img_size", metavar=4096, default=None, type=np.int32, help = "long edge size of micrograph files (default 4096)")
+    parser.add_argument("--edge_cut", metavar=0, default=0, type=np.int32, help = "edge crop size for micrograph files (default 0)")
     
     # Dust Removal
-    parser.add_option("--lo_dep", metavar=200., default=200., type=np.float, help = "dust depression filter size (default 200 A)")
+    parser.add_argument("--lo_dep", metavar=200., default=200., type=np.float32, help = "dust depression filter size (default 200 A)")
 
     # Picking Parameters
-    parser.add_option("--core_num", metavar=1, default=1, type=np.int, help = "number of processes for picking (default 1)")
-    parser.add_option("--cscale", metavar=4, default=4, type=np.int, help = "central range for localized normalization (default 4)")
-    parser.add_option("--resample_rate", metavar=2, default=2, type=np.int, help = "rescaling rate for particle picking (default 2)")
-    parser.add_option("--aperture", metavar=128, default=128, type=np.int, help = "detection aperture for particle (default 128 A)")
-    parser.add_option("--mass_min", metavar=0.5, default=0.5, type=np.float, help = "minimal mass for picking (default 0.5)")
+    parser.add_argument("--core_num", metavar=1, default=1, type=np.int32, help = "number of processes for picking (default 1)")
+    parser.add_argument("--cscale", metavar=4, default=4, type=np.int32, help = "central range for localized normalization (default 4)")
+    parser.add_argument("--resample_rate", metavar=2, default=2, type=np.int32, help = "rescaling rate for particle picking (default 2)")
+    parser.add_argument("--aperture", metavar=128, default=128, type=np.int32, help = "detection aperture for particle (default 128 A)")
+    parser.add_argument("--mass_min", metavar=0.5, default=0.5, type=np.float32, help = "minimal mass for picking (default 0.5)")
     
     # GPU
-    parser.add_option("--gpu_id", metavar='1', default=None, type='string', help= "used GPU id number (None to use all devices)")
+    parser.add_argument("--gpu_id", metavar='1', default=None, type=str, help= "used GPU id number (None to use all devices)")
     
     # DEBUG
-    parser.add_option("--debug", action='store_true', default=False, help = "debug mode (default False)")
+    parser.add_argument("--debug", action='store_true', default=False, help = "debug mode (default False)")
  
     # advanced
-    parser.add_option("--mode", metavar='pick', default=None, type='string', help = SUPPRESS_HELP )
-    parser.add_option("--prob_thres", metavar=0.5, default = 0.5, type=np.float, help = SUPPRESS_HELP)
-    parser.add_option("--adpmass", action='store_true', default=False, help = SUPPRESS_HELP)
-    parser.add_option("--enhance", action='store_true', default=True, help = SUPPRESS_HELP)
-    parser.add_option("--dust_removal", action='store_true', default=True, help = SUPPRESS_HELP)
-    parser.add_option("--cvk_size", metavar = 7, default = 7, type=np.int, help = SUPPRESS_HELP)
-    parser.add_option("--saturate_rate", metavar=0.1, default=0.1, type=np.float, help = SUPPRESS_HELP)
-    parser.add_option("--repick", action='store_true', default=False, help = SUPPRESS_HELP)
-    parser.add_option("--ext_format", metavar='star', default='star', type='string', help = SUPPRESS_HELP)
+    parser.add_argument("--mode", metavar='pick', default=None, type=str, help = SUPPRESS_HELP )
+    parser.add_argument("--prob_thres", metavar=0.5, default = 0.5, type=np.float32, help = SUPPRESS_HELP)
+    parser.add_argument("--adpmass", action='store_true', default=False, help = SUPPRESS_HELP)
+    parser.add_argument("--enhance", action='store_true', default=True, help = SUPPRESS_HELP)
+    parser.add_argument("--dust_removal", action='store_true', default=True, help = SUPPRESS_HELP)
+    parser.add_argument("--cvk_size", metavar = 7, default = 7, type=np.int32, help = SUPPRESS_HELP)
+    parser.add_argument("--saturate_rate", metavar=0.1, default=0.1, type=np.float32, help = SUPPRESS_HELP)
+    parser.add_argument("--repick", action='store_true', default=False, help = SUPPRESS_HELP)
+    parser.add_argument("--ext_format", metavar='star', default='star', type=str, help = SUPPRESS_HELP)
     
    
-    (global_options, global_args) = parser.parse_args()
+    global_options  = parser.parse_args()
     command = ' '.join(sys.argv)
     
     global_mode = 'pick'
@@ -758,7 +759,7 @@ if __name__ == '__main__':
                 def __init__(self, name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reverseI = True , highPass = 500 , hard = True , lowerBound = 0 , upperBound = 3, DEBUG=False):
 
                     self.inputMap = np.zeros( (2 , inputSize , inputSize , 1) , dtype = np.float32)
-
+                    
                     with mrcfile.open(name , 'r' , permissive=True) as mrc:
                         origMap  = mrc.data
                         origMapNC= mic_preprocess.nmlizeC(iput = origMap , cscale = 4)
@@ -817,11 +818,11 @@ if __name__ == '__main__':
             
 
 
-            void_picking(global_options,global_args)
+            void_picking(global_options)
         
             session.close()
         else:
-            void_picking(global_options,global_args)  
+            void_picking(global_options)  
     
     else:
         print("Unrecognized mode choice !!")
