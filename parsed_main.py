@@ -188,9 +188,15 @@ def adpmass(inMap, inSize=9 , binSize=30 , conv = 5 , thres = 5 ):
 def micGen(name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reverseI = True , highPass = 500 , hard = True , lowerBound = 0 , upperBound = 3, DEBUG=False, global_TrackParticleSize_actual = 9, hard_dust_removal=True , cuttingedge_lowD=0 , cuttingedge_highD=-1 , cscale = 4):
     #Input Map
     inputMap = np.zeros( (inputSize , inputSize , 1) , dtype = np.float32)
-    with mrcfile.open(name , 'r' , permissive=True) as mrc:
-        origMap  = np.float32(mrc.data)
-        origMapNC= mic_preprocess.nmlizeC(iput = origMap , cscale = 4)
+    if ".jpg" in name:
+        from PIL import Image
+        with Image.open(name) as mrc:
+            origMap = np.array(mrc, dtype="np.float32")
+    else:
+        with mrcfile.open(name , 'r' , permissive=True) as mrc:
+            origMap  = np.float32(mrc.data)
+            origMapNC= mic_preprocess.nmlizeC(iput = origMap , cscale = 4)
+            
     downScale , GauSigma , kSize = gauFactor
 
     # checkpoint mrcread
