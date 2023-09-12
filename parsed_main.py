@@ -190,8 +190,9 @@ def micGen(name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reve
     inputMap = np.zeros( (inputSize , inputSize , 1) , dtype = np.float32)
     if ".jpg" in name:
         from PIL import Image
-        with Image.open(name) as mrc:
-            origMap = np.array(mrc, dtype="np.float32")
+        with Image.open(name, 'r') as mrc:
+            origMap = np.array(mrc, dtype=np.float32)
+            origMapNC= mic_preprocess.nmlizeC(iput = origMap , cscale = 4)
     else:
         with mrcfile.open(name , 'r' , permissive=True) as mrc:
             origMap  = np.float32(mrc.data)
@@ -203,7 +204,8 @@ def micGen(name , gauFactor , mname , dataset_angPixel , inputSize = 1024 , reve
     if global_timer:                        
         timeseries_end1.append(time.time())
 
-    filterMap = cv2.GaussianBlur( origMapNC , (kSize , kSize) , GauSigma) #/ 0.1 #ampCont
+    #filterMap = cv2.GaussianBlur( origMapNC , (kSize , kSize) , GauSigma) #/ 0.1 #ampCont
+    filterMap = origMapNC
 
     if reverseI == True:
         filterMap = - filterMap
