@@ -1,0 +1,37 @@
+inputRoot=
+outputRoot=
+bash parsed_jpg.sh     10005   3710  172 1.2156 ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10017   4096  191 1.77   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10028   4096  300 1.34   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10059   3838  161 1.22   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10061   7676  150 0.3185 ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10075   4096  270 1.16   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10077   4096  250 1.16   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10081   3838  200 1.3    ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10093   3838  209 1.22   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10096   3838  110 1.31   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10184   3838  100 0.85   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10240   3838  170 1.0961 ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10289   3838  199 1.232  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10291   3838  160 1.232  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10345   3838  100 0.673  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10387   3838  168 0.79   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10389a  3838  200 0.639  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10389b  3838  200 0.639  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10406   3838  226 1.07   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10444   5760  180 0.83   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10526   7676  400 0.83   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10532   4096  179 1.03   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10576   7676  180 0.68   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10590   3838  237 1.5    ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10669   7676  500 0.685  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10671   5760  110 0.83   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10737   5760  179 1      ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10760   3838  130 1.232  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10816   7676  179 0.5    ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10852   5760  111 0.91   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     10947   4096  199 0.83   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     11051   3838  179 0.84   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     11056   5760  136 0.83   ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     11057   5760  139 0.752  ${inputRoot} ${outputRoot}
+bash parsed_jpg.sh     11183   5760  139 0.88   ${inputRoot} ${outputRoot}
