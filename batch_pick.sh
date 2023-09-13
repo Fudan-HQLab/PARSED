@@ -1,6 +1,6 @@
-inputRoot=
-outputRoot=
-bash parsed_jpg.sh     10005   3710  172 1.2156 ${inputRoot} ${outputRoot}
+inputRoot=/data/parsed2/cryo3P
+outputRoot=/data/parsed2/pickPerf
+#bash parsed_jpg.sh     10005   3838  172 1.2156 ${inputRoot} ${outputRoot}
 bash parsed_jpg.sh     10017   4096  191 1.77   ${inputRoot} ${outputRoot}
 bash parsed_jpg.sh     10028   4096  300 1.34   ${inputRoot} ${outputRoot}
 bash parsed_jpg.sh     10059   3838  161 1.22   ${inputRoot} ${outputRoot}
